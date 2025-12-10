@@ -1,0 +1,32 @@
+.wave-bg {
+  position: relative;
+  background: #e9f8f2;
+  padding-top: 60px;
+  padding-bottom: 80px;
+}
+
+.wave-bg::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: url("data:image/svg+xml,%3Csvg width='1600' height='200' viewBox='0 0 1600 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23cfeee3' fill-opacity='0.7' d='M0,100 C400,200 800,0 1600,150 L1600,00 L0,0 Z'/%3E%3C/svg%3E")
+    no-repeat;
+  background-size: cover;
+  opacity: 0.5;
+}
+
+.wave-bg::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: url("data:image/svg+xml,%3Csvg width='1600' height='200' viewBox='0 0 1600 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23cfeee3' fill-opacity='0.5' d='M0,150 C500,20 900,220 1600,50 L1600,200 L0,200 Z'/%3E%3C/svg%3E")
+    no-repeat;
+  background-size: cover;
+  opacity: 0.5;
+}

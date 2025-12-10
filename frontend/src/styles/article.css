@@ -1,0 +1,506 @@
+/* =========================================================
+   THEME VARIABLES — LIGHT MODE (DEFAULT)
+   ========================================================= */
+:root {
+  --bg-page: #f6f7f9;
+  --bg-box: #ffffff;
+  --bg-author: #f9fafb;
+  --bg-highlight: #ecfdf5;
+  --bg-related: #ecfdf5;
+
+  --text-main: #1b1b1b;
+  --text-body: #333;
+  --text-muted: #444;
+  --text-green: #065f46;
+
+  --border-default: #e5e7eb;
+  --border-green: #34d399;
+
+  --accent-green: #059669;
+  --accent-green-dark: #047857;
+
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.12);
+
+  --banner-filter: none;
+
+  --share-btn-bg: #ffffff;
+  --share-btn-shadow: rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   THEME VARIABLES — DARK MODE
+   ========================================================= */
+[data-theme="dark"] {
+  --bg-page: #0b1220;
+  --bg-box: #0f1724;
+  --bg-author: #071021;
+  --bg-highlight: #0f241a;
+  --bg-related: #0f241a;
+
+  --text-main: #e6eef6;
+  --text-body: #d7dde5;
+  --text-muted: #9ca3af;
+  --text-green: #bbf7d0;
+
+  --border-default: #1f2937;
+  --border-green: #059669;
+
+  --accent-green: #34d399;
+  --accent-green-dark: #22c38d;
+
+  --shadow-light: rgba(0, 0, 0, 0.45);
+  --shadow-medium: rgba(0, 0, 0, 0.55);
+
+  --banner-filter: brightness(0.6);
+
+  --share-btn-bg: #111827;
+  --share-btn-shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* =========================================================
+   ARTICLE WRAPPER
+   ========================================================= */
+.article-wrapper {
+  background: var(--bg-page);
+  min-height: 100vh;
+  padding: 50px 20px;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* =========================================================
+   ARTICLE BOX
+   ========================================================= */
+.article-box {
+  background: var(--bg-box);
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 45px;
+  border-radius: 16px;
+  box-shadow: 0 6px 30px var(--shadow-light);
+  line-height: 1.85;
+  font-size: 17px;
+  border: 1px solid var(--border-default);
+
+  opacity: 0;
+  transform: translateY(25px);
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+
+/* =========================================================
+   HEADER BANNER (fixed size)
+   ========================================================= */
+.article-header-banner {
+  background: url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6")
+    center/cover no-repeat;
+  height: 240px;
+  width: 100%;
+  border-bottom: 5px solid var(--accent-green);
+  margin-bottom: 20px;
+  filter: var(--banner-filter);
+}
+
+/* =========================================================
+   BREADCRUMBS
+   ========================================================= */
+.article-breadcrumbs {
+  max-width: 900px;
+  margin: 0 auto 10px auto;
+  font-size: 15px;
+  color: var(--text-muted);
+  padding: 0 16px;
+}
+
+.article-breadcrumbs a {
+  color: var(--accent-green);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* =========================================================
+   TYPOGRAPHY
+   ========================================================= */
+.article-title {
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+}
+
+.article-content h2 {
+  font-size: 28px;
+  margin-top: 45px;
+  margin-bottom: 10px;
+  color: var(--accent-green-dark);
+  font-weight: 700;
+  border-left: 5px solid var(--border-green);
+  padding-left: 12px;
+}
+
+.article-content h3 {
+  font-size: 22px;
+  margin-top: 28px;
+  margin-bottom: 6px;
+  color: var(--text-green);
+  font-weight: 600;
+}
+
+.article-content p {
+  margin: 16px 0;
+  font-size: 17px;
+  line-height: 1.85;
+  color: var(--text-body);
+}
+
+.article-content section {
+  border-top: 1px solid var(--border-default);
+  padding-top: 25px;
+  margin-top: 25px;
+}
+
+/* =========================================================
+   TAGS
+   ========================================================= */
+.article-tags {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.article-tag {
+  background: var(--bg-highlight);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-green);
+  font-weight: 600;
+}
+
+/* =========================================================
+   IMAGES
+   ========================================================= */
+.article-img-large,
+.article-img-medium,
+.article-img-small {
+  display: block;
+  border-radius: 14px;
+  margin: 28px auto;
+  box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+.article-img-large {
+  width: 100%;
+}
+
+.article-img-medium {
+  width: 80%;
+}
+
+.article-img-small {
+  width: 50%;
+}
+
+/* =========================================================
+   HIGHLIGHT BOXES
+   ========================================================= */
+.highlight-box {
+  background: var(--bg-highlight);
+  border-left: 6px solid var(--accent-green);
+  padding: 20px;
+  border-radius: 8px;
+  margin: 28px 0;
+  color: var(--text-green);
+  font-size: 17px;
+  box-shadow: 0 2px 10px var(--shadow-light);
+}
+
+/* =========================================================
+   SHARE BAR (FLOATING)
+   ========================================================= */
+.floating-share-bar {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 999;
+}
+
+.share-btn {
+  background: var(--share-btn-bg);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--share-btn-shadow);
+  transition: 0.25s ease;
+}
+
+.share-btn:hover {
+  transform: scale(1.12);
+}
+
+/* =========================================================
+   AUTHOR BOX
+   ========================================================= */
+.author-box {
+  margin-top: 55px;
+  display: flex;
+  gap: 20px;
+  background: var(--bg-author);
+  padding: 22px;
+  border-radius: 12px;
+  border-left: 6px solid var(--border-green);
+  box-shadow: 0 4px 18px var(--shadow-light);
+  border: 1px solid var(--border-default);
+}
+
+.author-avatar {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.author-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.author-info h4 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.author-info p {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   RELATED ARTICLES
+   ========================================================= */
+.related-articles {
+  margin-top: 55px;
+}
+
+.related-articles h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: var(--text-main);
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.related-card {
+  background: var(--bg-related);
+  padding: 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  border: 1px solid var(--border-default);
+  color: var(--text-green);
+  box-shadow: 0 6px 18px var(--shadow-light);
+  transition: 0.2s ease;
+}
+
+.related-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-green);
+}
+
+.related-desc {
+  color: var(--text-muted);
+}
+
+.related-link {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+/* =========================================================
+   NAVIGATION BUTTONS
+   ========================================================= */
+.nav-buttons {
+  margin-top: 45px;
+  display: flex;
+  gap: 12px;
+}
+
+.nav-btn {
+  background: var(--accent-green);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.nav-btn:hover {
+  background: var(--accent-green-dark);
+}
+
+/* =========================================================
+   BACK TO TOP BUTTON
+   ========================================================= */
+.back-top-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: var(--accent-green);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 8px 30px var(--shadow-medium);
+  z-index: 999;
+  border: none;
+  font-weight: 600;
+}
+
+/* =========================================================
+   DARK/LIGHT MODE TOGGLE BUTTON
+   ========================================================= */
+.article-theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--accent-green);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px var(--shadow-medium);
+  z-index: 999;
+  border: none;
+  font-weight: 600;
+}
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+  .article-box {
+    padding: 30px;
+  }
+
+  .article-title {
+    font-size: 30px;
+  }
+
+  .article-content h2 {
+    font-size: 24px;
+  }
+
+  .floating-share-bar {
+    display: none;
+  }
+}
+/* Fix for emoji warning lines becoming too dim in dark mode */
+[data-theme="dark"] .article-content p {
+  color: var(--text-main); /* Make paragraph text brighter */
+}
+
+/* If the lines use list items instead */
+[data-theme="dark"] .article-content li {
+  color: var(--text-main);
+}
+.share-btn img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+}
+/* FAQ polish */
+.faq-item {
+  backdrop-filter: blur(3px);
+}
+
+.faq-question:hover {
+  background: var(--bg-highlight);
+  transition: 0.25s ease;
+}
+
+.faq-answer {
+  animation: faqOpen 0.25s ease;
+}
+
+@keyframes faqOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* GLOBAL DARK MODE FOR ARTICLE PAGES */
+.dark-article body,
+.dark-article .article-wrapper,
+.dark-article .article-box {
+  background: #0f0f0f !important;
+  color: #f1f1f1 !important;
+}
+
+.dark-article .article-title,
+.dark-article .article-content,
+.dark-article .article-tag,
+.dark-article .author-info p,
+.dark-article .related-title,
+.dark-article .related-desc,
+.dark-article .related-link {
+  color: #f1f1f1 !important;
+}
+
+.dark-article .article-box {
+  border-color: #333 !important;
+}
+
+.dark-article .author-box {
+  background: #1a1a1a !important;
+}
+
+.dark-article .related-card {
+  background: #1a1a1a !important;
+  border-color: #333 !important;
+}
+
+.dark-article .nav-btn {
+  background: #222 !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+
+.dark-article .article-breadcrumbs a,
+.dark-article .article-breadcrumbs span {
+  color: #ccc !important;
+}

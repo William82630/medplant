@@ -1,0 +1,117 @@
+/* ===============================
+   GLOBAL RESET & TYPOGRAPHY
+================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background: #f5f7f6;
+  color: #222;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Container Utility */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Section spacing */
+.section {
+  padding: 60px 20px;
+}
+
+/* Unified Headings */
+h1 {
+  font-size: 34px;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+h2 {
+  font-size: 26px;
+  margin: 35px 0 10px;
+  color: #0a5328;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 20px;
+  margin: 20px 0 10px;
+  color: #0a5328;
+}
+
+/* --------------------------------
+   GLOBAL PAGE FADE-IN ANIMATION
+----------------------------------- */
+.page-fade {
+  opacity: 0;
+  transform: translateY(15px);
+  animation: pageFadeUp 0.45s ease-out forwards;
+}
+
+@keyframes pageFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------
+   BUTTON STYLES (GLOBAL)
+----------------------------------- */
+.btn-primary {
+  background: #0a5328;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.btn-primary:hover {
+  background: #0e7041;
+}
+
+/* Soft shadow utility */
+.soft-shadow {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+.page-hero-img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

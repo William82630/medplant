@@ -1,0 +1,136 @@
+/* src/styles/report.css */
+.report-wrapper {
+  padding: 22px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(12, 24, 40, 0.06);
+  color: #0b1320;
+  line-height: 1.6;
+  max-width: 980px;
+  margin: 18px auto;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.report-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #0f1724;
+  letter-spacing: -0.2px;
+}
+
+.report-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 36, 0.06);
+  background: #f6f9fb;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.icon-btn:hover {
+  transform: translateY(-1px);
+}
+
+.report-content {
+  margin-top: 12px;
+  color: #12202b;
+  font-size: 15px;
+  background: transparent;
+}
+
+/* Headings */
+.report-content h1,
+.report-content h2,
+.report-content h3,
+.report-content h4 {
+  color: #0b1720;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+
+/* Paragraph */
+.report-content p {
+  margin: 8px 0 12px;
+  color: #26323a;
+}
+
+/* Lists */
+.report-content ul,
+.report-content ol {
+  margin: 8px 0 12px 20px;
+}
+
+/* Tables */
+.report-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  background: #fff;
+}
+
+.report-content thead th {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid #eef3f6;
+  background: linear-gradient(180deg, #fbfdff, #f7fbff);
+  color: #0b1720;
+  font-weight: 600;
+}
+
+.report-content td {
+  padding: 10px;
+  border-bottom: 1px solid #f1f5f8;
+  vertical-align: top;
+  color: #1f2d33;
+}
+
+/* Inline code & code block */
+.report-content code {
+  background: #f6f8fa;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.report-content pre {
+  background: #0f1724;
+  color: #f6fbff;
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+/* Footer small note */
+.report-footer {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #6b7785;
+}
+
+/* Empty state card */
+.report-empty {
+  max-width: 900px;
+  margin: 16px auto;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: #4b5563;
+}
