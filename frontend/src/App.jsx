@@ -17,10 +17,13 @@ import HerbalRemedies from "./pages/HerbalRemedies";
 import AyurvedicUses from "./pages/AyurvedicUses";
 import PlantDetail from "./pages/PlantDetail";
 import Search from "./pages/Search";
-import SavedPlants from "./pages/SavedPlants"; // ⭐ Correct one
+import SavedPlants from "./pages/SavedPlants";
 import Login from "./pages/Login";
 import Identify from "./pages/Identify";
 import FAQ from "./pages/FAQ";
+
+// ⭐ Added by ChatGPT
+import MedPlantPro from "./pages/MedPlantPro";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -28,7 +31,7 @@ import Footer from "./components/Footer";
 
 
 // =============================
-// ⭐ Smooth scroll on route change
+// Smooth scroll on route change
 // =============================
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -39,7 +42,7 @@ function ScrollToTop() {
 }
 
 // =============================
-// ⭐ Floating Back-to-Top Button
+// Floating Back-to-Top Button
 // =============================
 function BackToTopButton() {
   const [visible, setVisible] = useState(false);
@@ -78,7 +81,7 @@ function BackToTopButton() {
 
 
 // =============================
-// ⭐ MAIN APP — FINAL VERSION
+// MAIN APP — FINAL
 // =============================
 export default function App() {
   return (
@@ -114,6 +117,9 @@ export default function App() {
 
           {/* Plant Details */}
           <Route path="/plant/:slug" element={<PlantDetail />} />
+
+          {/* ⭐ Added by ChatGPT — Pro Page Route */}
+          <Route path="/pro" element={<MedPlantPro />} />
 
         </Routes>
       </div>

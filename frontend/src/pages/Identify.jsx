@@ -1,14 +1,12 @@
 // ==============================
-// Identify.jsx — Premium MedPlant UI (Fixed Final Version)
+// Identify.jsx — MedPlant (Backend AI Version — FINAL FIXED)
 // ==============================
 import { useState, useRef } from "react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import ReportViewer from "../components/ReportViewer";
 import LoginModal from "../components/LoginModal";
 import ReportModal from "../components/ReportModal";
 import UpgradeModal from "../components/UpgradeModal";
-import { supabase } from "../lib/supabaseClient";   // <-- FIXED
-import { getAnonCredits, useAnonCredit } from "../utils/credits";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Identify() {
   const [imagePreview, setImagePreview] = useState(null);
@@ -21,17 +19,10 @@ export default function Identify() {
   const [modalTitle, setModalTitle] = useState("Medicinal Plant Report");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [upgradeRemaining, setUpgradeRemaining] = useState(0);
 
   const uploadRef = useRef(null);
 
-  const fileToBase64 = (file) =>
-    new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.readAsDataURL(file);
-    });
-
+  // Extract report title
   const extractTitle = (md) => {
     if (!md) return "Medicinal Plant Report";
     const firstLine = md.split("\n")[0];
@@ -40,7 +31,7 @@ export default function Identify() {
   };
 
   // -------------------------------------------------
-  // HANDLE FILE + ANALYSIS
+  // HANDLE FILE + BACKEND AI ANALYSIS (CLEAN VERSION)
   // -------------------------------------------------
   const handleFile = async (file) => {
     if (!file) return;
@@ -49,76 +40,66 @@ export default function Identify() {
     setErrorMsg("");
     setLoading(true);
 
-    // preview
+    // Preview image
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
     reader.readAsDataURL(file);
 
-    // credit check
-    const { data: auth } = await supabase.auth.getUser();
-    const loggedIn = !!auth?.user;
+    try {
+      // Get session token
+      let session = null;
+      try {
+        const { data: { session: s } } = await supabase.auth.getSession();
+        session = s;
+      } catch (e) {
+        console.error("Supabase session error:", e);
+        // Continue without auth for anonymous users
+      }
 
-    if (!loggedIn) {
-      const left = getAnonCredits();
-      if (left <= 0) {
-        setUpgradeRemaining(left);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const headers = {};
+
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      // Call backend
+      const res = await fetch("http://127.0.0.1:8000/api/identify", {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      // Auth required
+      if (res.status === 401) {
+        setShowLoginModal(true);
+        setLoading(false);
+        return;
+      }
+
+      // No credits
+      if (res.status === 402) {
         setShowUpgradeModal(true);
         setLoading(false);
         return;
       }
-      useAnonCredit();
-    } else {
-      // fetch profile (FIXED user_id column)
-      const { data: profile } = await supabase
-        .from("user_profiles")
-        .select("credits_remaining, is_pro")
-        .eq("user_id", auth.user.id)
-        .single();
 
-      if (!profile?.is_pro) {
-        const left = Number(profile?.credits_remaining ?? 0);
-        if (left <= 0) {
-          setUpgradeRemaining(left);
-          setShowUpgradeModal(true);
-          setLoading(false);
-          return;
-        }
+      const data = await res.json();
+console.log("BACKEND RESPONSE:", data);
 
-        await supabase
-          .from("user_profiles")
-          .update({ credits_remaining: Math.max(left - 1, 0) })
-          .eq("user_id", auth.user.id);   // <-- FIXED
+      if (data.error) {
+        setErrorMsg(data.error);
+      } else if (data.analysis) {
+        setMarkdown(data.analysis);
+        setModalTitle(extractTitle(data.analysis));
+      } else {
+        setErrorMsg("MedPlant AI could not generate a report.");
       }
-    }
-
-    // call Gemini
-    try {
-      const base64 = await fileToBase64(file);
-      const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-      const prompt = `
-You are MedPlant AI. Produce a structured medicinal plant report in Markdown.
-Include:
-- Identification (with confidence)
-- Medicinal Uses
-- Preparation & Dosage
-- Toxicity & Warnings
-- Drug Interactions
-- Evidence summary
-`;
-
-      const response = await model.generateContent([
-        { inlineData: { data: base64, mimeType: "image/jpeg" } },
-        { text: prompt },
-      ]);
-      const text = await response.text();
-
-      setMarkdown(text);
-      setModalTitle(extractTitle(text));
     } catch (err) {
       console.error(err);
-      setErrorMsg("AI failed to analyze the plant. Try another image.");
+      setErrorMsg("AI failed to analyze the plant.");
     }
 
     setLoading(false);
@@ -189,7 +170,9 @@ Include:
         }}
       >
         <div style={{ fontSize: 50, marginBottom: 10 }}>📤</div>
-        <div style={{ fontSize: 20, fontWeight: 600 }}>Click or Drag & Drop an image</div>
+        <div style={{ fontSize: 20, fontWeight: 600 }}>
+          Click or Drag & Drop an image
+        </div>
         <div style={{ fontSize: 14, color: "var(--text-secondary)" }}>
           JPG / PNG — Clear leaf, flower, or branch recommended
         </div>
@@ -324,7 +307,7 @@ Include:
       <UpgradeModal
         open={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
-        remaining={upgradeRemaining}
+        remaining={0}
       />
     </div>
   );

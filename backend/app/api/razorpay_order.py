@@ -1,7 +1,7 @@
 import os
 import razorpay
 from fastapi import APIRouter, HTTPException, Request
-from supabase import create_client
+from app.utils.supabase_client import supabase
 
 router = APIRouter()
 
@@ -15,21 +15,6 @@ if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
     print("❌ Razorpay keys missing in .env")
 
 client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
-
-# ---------------------------------------------------------
-# 🔥 Load Supabase credentials from .env
-# MUST use correct variable names
-# ---------------------------------------------------------
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = (
-    os.getenv("SUPABASE_SERVICE_ROLE_KEY") or
-    os.getenv("SUPABASE_ANON_KEY")
-)
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    print("❌ Supabase credentials missing in .env")
-
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------------------------------------------------
 # Create Razorpay Order Route

@@ -2,17 +2,11 @@ from fastapi import APIRouter, Request, HTTPException
 import hmac
 import hashlib
 import json
-from supabase import create_client
+from app.utils.supabase_client import supabase
 import os
 
 # Initialize FastAPI Router
 router = APIRouter()
-
-# Supabase client
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
-
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Webhook endpoint
 @router.post("/razorpay/webhook")

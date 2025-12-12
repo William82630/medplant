@@ -1,9 +1,9 @@
 // ======================================
-// MedPlantPro.jsx — Final Pro Page
-// With Razorpay + PayPal placeholder integration
+// MedPlantPro.jsx — FINAL FIXED VERSION
+// Razorpay (India) + PayPal (International)
 // ======================================
 import { useEffect, useState } from "react";
-import { supabase } from "../supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 
 // -------------------------
 // Detect User Country
@@ -14,7 +14,7 @@ const detectCountry = async () => {
     const data = await res.json();
     return data.country || "IN";
   } catch {
-    return "IN"; // fallback
+    return "IN";
   }
 };
 
@@ -23,24 +23,33 @@ export default function MedPlantPro() {
   const [loading, setLoading] = useState(true);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
 
-  // Razorpay Links (replace later)
+  // Razorpay Keys (real key goes here)
+  const RAZORPAY_KEY = "YOUR_RAZORPAY_KEY";
+
+  // Razorpay Plans (Keep your original links or replace with Orders API later)
   const RAZORPAY_MONTHLY = "https://rzp.io/l/YOUR_MONTHLY_LINK";
   const RAZORPAY_YEARLY = "https://rzp.io/l/YOUR_YEARLY_LINK";
 
-  // PayPal Subscriptions (replace later)
+  // PayPal Plans
   const PAYPAL_MONTHLY_PLAN = "YOUR_PAYPAL_MONTHLY_PLAN_ID";
   const PAYPAL_YEARLY_PLAN = "YOUR_PAYPAL_YEARLY_PLAN_ID";
   const PAYPAL_CLIENT_ID = "YOUR_PAYPAL_CLIENT_ID";
 
-  // ------------------------------------
-  // Load region + PayPal SDK
-  // ------------------------------------
+  // -------------------------
+  // Load region + PayPal SDK + Razorpay SDK
+  // -------------------------
   useEffect(() => {
     (async () => {
       const c = await detectCountry();
       setCountry(c);
       setLoading(false);
 
+      // Load Razorpay script
+      const razorScript = document.createElement("script");
+      razorScript.src = "https://checkout.razorpay.com/v1/checkout.js";
+      document.body.appendChild(razorScript);
+
+      // Load PayPal script only for non-India
       if (c !== "IN") {
         const script = document.createElement("script");
         script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
@@ -51,61 +60,90 @@ export default function MedPlantPro() {
   }, []);
 
   // ------------------------------------
-  // PayPal MONTHLY
+  // HANDLE RAZORPAY CHECKOUT
+  // ------------------------------------
+  const openRazorpay = async (planType) => {
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth?.user?.id) return alert("Please log in first");
+
+    const amountINR = planType === "monthly" ? 79 * 100 : 799 * 100;
+
+    const options = {
+      key: RAZORPAY_KEY,
+      amount: amountINR,
+      currency: "INR",
+      name: "MedPlant Pro",
+      description: planType === "monthly" ? "Monthly Subscription" : "Annual Subscription",
+      handler: async () => {
+        await supabase
+          .from("user_profiles")
+          .update({ is_pro: true })
+          .eq("id", auth.user.id);
+
+        alert("Subscription activated successfully!");
+      },
+      prefill: {
+        email: auth.user.email,
+      },
+      theme: {
+        color: "#059669",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+  // ------------------------------------
+  // PAYPAL MONTHLY
   // ------------------------------------
   useEffect(() => {
     if (country === "IN" || !paypalLoaded) return;
     if (!document.getElementById("paypal-monthly")) return;
 
-    window.paypal
-      .Buttons({
-        style: { label: "subscribe", color: "gold" },
-        createSubscription: (data, actions) =>
-          actions.subscription.create({ plan_id: PAYPAL_MONTHLY_PLAN }),
+    if (!window.paypal) return;
 
-        onApprove: async () => {
-          alert("🎉 Monthly Subscription Activated!");
-          const { data: auth } = await supabase.auth.getUser();
-          if (auth?.user?.id) {
-            await supabase
-              .from("user_profiles")
-              .update({ is_pro: true })
-              .eq("id", auth.user.id);
-          }
-        },
+    window.paypal.Buttons({
+      style: { label: "subscribe", color: "gold" },
+      createSubscription: (data, actions) =>
+        actions.subscription.create({ plan_id: PAYPAL_MONTHLY_PLAN }),
 
-        onError: () => alert("Payment failed."),
-      })
-      .render("#paypal-monthly");
+      onApprove: async () => {
+        const { data: auth } = await supabase.auth.getUser();
+        if (auth?.user?.id) {
+          await supabase.from("user_profiles").update({ is_pro: true }).eq("id", auth.user.id);
+        }
+        alert("Monthly Subscription Activated!");
+      },
+
+      onError: () => alert("Payment failed"),
+    }).render("#paypal-monthly");
   }, [paypalLoaded, country]);
 
   // ------------------------------------
-  // PayPal YEARLY
+  // PAYPAL YEARLY
   // ------------------------------------
   useEffect(() => {
     if (country === "IN" || !paypalLoaded) return;
     if (!document.getElementById("paypal-yearly")) return;
 
-    window.paypal
-      .Buttons({
-        style: { label: "subscribe", color: "gold" },
-        createSubscription: (data, actions) =>
-          actions.subscription.create({ plan_id: PAYPAL_YEARLY_PLAN }),
+    if (!window.paypal) return;
 
-        onApprove: async () => {
-          alert("🎉 Yearly Subscription Activated!");
-          const { data: auth } = await supabase.auth.getUser();
-          if (auth?.user?.id) {
-            await supabase
-              .from("user_profiles")
-              .update({ is_pro: true })
-              .eq("id", auth.user.id);
-          }
-        },
+    window.paypal.Buttons({
+      style: { label: "subscribe", color: "gold" },
+      createSubscription: (data, actions) =>
+        actions.subscription.create({ plan_id: PAYPAL_YEARLY_PLAN }),
 
-        onError: () => alert("Payment failed."),
-      })
-      .render("#paypal-yearly");
+      onApprove: async () => {
+        const { data: auth } = await supabase.auth.getUser();
+        if (auth?.user?.id) {
+          await supabase.from("user_profiles").update({ is_pro: true }).eq("id", auth.user.id);
+        }
+        alert("Yearly Subscription Activated!");
+      },
+
+      onError: () => alert("Payment failed"),
+    }).render("#paypal-yearly");
   }, [paypalLoaded, country]);
 
   // ------------------------------------
@@ -114,7 +152,7 @@ export default function MedPlantPro() {
   if (loading) {
     return (
       <div style={{ textAlign: "center", padding: 60, fontSize: 20 }}>
-        Detecting your region… 🌍
+        Detecting your region…
       </div>
     );
   }
@@ -122,52 +160,22 @@ export default function MedPlantPro() {
   const isIndia = country === "IN";
 
   return (
-    <div
-      style={{
-        maxWidth: 900,
-        margin: "40px auto",
-        padding: 20,
-        fontFamily: "Inter, sans-serif",
-      }}
-    >
-      <h1
-        style={{
-          fontSize: 40,
-          fontWeight: 800,
-          textAlign: "center",
-          color: "#064e3b",
-        }}
-      >
+    <div style={{ maxWidth: 900, margin: "40px auto", padding: 20 }}>
+      <h1 style={{ fontSize: 40, fontWeight: 800, textAlign: "center", color: "#064e3b" }}>
         MedPlant Pro
       </h1>
 
-      <p
-        style={{
-          textAlign: "center",
-          color: "#555",
-          fontSize: 18,
-          marginBottom: 30,
-        }}
-      >
-        Unlock unlimited medicinal plant knowledge — safely, instantly, and
-        affordably.
+      <p style={{ textAlign: "center", color: "#555", fontSize: 18, marginBottom: 30 }}>
+        Unlock unlimited medicinal plant knowledge — safely, instantly, and affordably.
       </p>
 
-      {/* ------------------------------------
-          Pricing Cards
-      ------------------------------------ */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 20,
-          marginTop: 20,
-        }}
-      >
-        {/* ================= MONTHLY PLAN ================= */}
+      {/* ------------------------------------ */}
+      {/* Pricing Grid */}
+      {/* ------------------------------------ */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 20 }}>
+        {/* MONTHLY */}
         <div style={planBox}>
           <h2 style={planTitle}>Monthly Plan</h2>
-
           <div style={priceText}>{isIndia ? "₹79 / month" : "$2 / month"}</div>
 
           <ul style={featureList}>
@@ -179,18 +187,17 @@ export default function MedPlantPro() {
           </ul>
 
           {isIndia ? (
-            <a href={RAZORPAY_MONTHLY} style={btnPrimary}>
+            <button onClick={() => openRazorpay("monthly")} style={btnPrimary}>
               Pay with Razorpay
-            </a>
+            </button>
           ) : (
-            <div id="paypal-monthly" style={{ marginTop: 10 }}></div>
+            <div id="paypal-monthly" style={{ marginTop: 10 }} />
           )}
         </div>
 
-        {/* ================= YEARLY PLAN ================= */}
+        {/* YEARLY */}
         <div style={planBox}>
           <h2 style={planTitle}>Annual Plan</h2>
-
           <div style={priceText}>{isIndia ? "₹799 / year" : "$20 / year"}</div>
 
           <div style={saveTag}>Save 2 Months!</div>
@@ -204,21 +211,19 @@ export default function MedPlantPro() {
           </ul>
 
           {isIndia ? (
-            <a href={RAZORPAY_YEARLY} style={btnPrimary}>
+            <button onClick={() => openRazorpay("yearly")} style={btnPrimary}>
               Pay with Razorpay
-            </a>
+            </button>
           ) : (
-            <div id="paypal-yearly" style={{ marginTop: 10 }}></div>
+            <div id="paypal-yearly" style={{ marginTop: 10 }} />
           )}
         </div>
       </div>
 
-      {/* ------------------------------------
-          What You Get
-      ------------------------------------ */}
-      <h2 style={{ marginTop: 60, fontSize: 28, fontWeight: 700 }}>
-        What You Get With MedPlant Pro
-      </h2>
+      {/* ------------------------------------ */}
+      {/* What You Get */}
+      {/* ------------------------------------ */}
+      <h2 style={{ marginTop: 60, fontSize: 28, fontWeight: 700 }}>What You Get With MedPlant Pro</h2>
 
       <ul style={bigList}>
         <li>Unlimited AI-powered identification</li>
@@ -226,9 +231,9 @@ export default function MedPlantPro() {
         <li>Preparation + dosage + toxicity + interactions</li>
         <li>Unlimited saved plants</li>
         <li>PDF / MD / Image export</li>
-        <li>No scan limits (fair use 30/hour)</li>
+        <li>No scan limits</li>
         <li>Priority email support (info@willsblogger.com)</li>
-        <li>Helps support future MedPlant development ❤️</li>
+        <li>Helps support future MedPlant development</li>
       </ul>
     </div>
   );

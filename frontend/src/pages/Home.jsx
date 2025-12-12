@@ -89,7 +89,7 @@ export default function Home() {
             {/* CTA buttons */}
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
               <Link
-                to="/search"
+                to="/identify"
                 style={{
                   padding: "14px 26px",
                   background: primaryGreen,
