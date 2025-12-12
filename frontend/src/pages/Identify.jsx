@@ -1,5 +1,5 @@
 // ==============================
-// Identify.jsx — MedPlant (Backend AI Version — FINAL FIXED)
+// Identify.jsx — MedPlant (FINAL VERIFIED VERSION)
 // ==============================
 import { useState, useRef } from "react";
 import ReportViewer from "../components/ReportViewer";
@@ -10,6 +10,8 @@ import { supabase } from "../lib/supabaseClient";
 
 export default function Identify() {
   const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+
   const [markdown, setMarkdown] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -30,56 +32,65 @@ export default function Identify() {
     return cleaned.length > 2 ? cleaned : "Medicinal Plant Report";
   };
 
-  // -------------------------------------------------
-  // HANDLE FILE + BACKEND AI ANALYSIS (CLEAN VERSION)
-  // -------------------------------------------------
-  const handleFile = async (file) => {
+  // ==========================================
+  // Handle selecting a file
+  // ==========================================
+  const handleSelectFile = (file) => {
     if (!file) return;
 
-    setMarkdown("");
     setErrorMsg("");
-    setLoading(true);
+    setMarkdown("");
+    setSelectedFile(file);
 
-    // Preview image
     const reader = new FileReader();
     reader.onloadend = () => setImagePreview(reader.result);
     reader.readAsDataURL(file);
+  };
+
+  // ==========================================
+  // MAIN IDENTIFY FUNCTION (calls backend)
+  // ==========================================
+  const handleIdentify = async () => {
+    if (!selectedFile) {
+      setErrorMsg("Please upload an image.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg("");
+    setMarkdown("");
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    // Optional session
+    let session = null;
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      session = s;
+    } catch (e) {
+      console.error("Session fetch error:", e);
+    }
+
+    const headers = {};
+    if (session?.access_token) {
+      headers["Authorization"] = `Bearer ${session.access_token}`;
+    }
 
     try {
-      // Get session token
-      let session = null;
-      try {
-        const { data: { session: s } } = await supabase.auth.getSession();
-        session = s;
-      } catch (e) {
-        console.error("Supabase session error:", e);
-        // Continue without auth for anonymous users
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const headers = {};
-
-      if (session?.access_token) {
-        headers["Authorization"] = `Bearer ${session.access_token}`;
-      }
-
-      // Call backend
       const res = await fetch("http://127.0.0.1:8000/api/identify", {
         method: "POST",
         headers,
         body: formData,
       });
 
-      // Auth required
       if (res.status === 401) {
         setShowLoginModal(true);
         setLoading(false);
         return;
       }
 
-      // No credits
       if (res.status === 402) {
         setShowUpgradeModal(true);
         setLoading(false);
@@ -87,7 +98,7 @@ export default function Identify() {
       }
 
       const data = await res.json();
-console.log("BACKEND RESPONSE:", data);
+      console.log("IDENTIFY RESPONSE:", data);
 
       if (data.error) {
         setErrorMsg(data.error);
@@ -105,9 +116,9 @@ console.log("BACKEND RESPONSE:", data);
     setLoading(false);
   };
 
-  // -------------------------------------------------
+  // ==========================================
   // SAVE REPORT
-  // -------------------------------------------------
+  // ==========================================
   const saveReport = async () => {
     const { data: user } = await supabase.auth.getUser();
 
@@ -129,9 +140,9 @@ console.log("BACKEND RESPONSE:", data);
     else alert("Saved!");
   };
 
-  // -------------------------------------------------
+  // ==========================================
   // UI
-  // -------------------------------------------------
+  // ==========================================
   return (
     <div
       style={{
@@ -166,7 +177,7 @@ console.log("BACKEND RESPONSE:", data);
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
-          handleFile(e.dataTransfer.files[0]);
+          handleSelectFile(e.dataTransfer.files[0]);
         }}
       >
         <div style={{ fontSize: 50, marginBottom: 10 }}>📤</div>
@@ -182,7 +193,7 @@ console.log("BACKEND RESPONSE:", data);
           accept="image/*"
           ref={uploadRef}
           style={{ display: "none" }}
-          onChange={(e) => handleFile(e.target.files[0])}
+          onChange={(e) => handleSelectFile(e.target.files[0])}
         />
       </div>
 
@@ -199,6 +210,27 @@ console.log("BACKEND RESPONSE:", data);
               borderRadius: 20,
             }}
           />
+        </div>
+      )}
+
+      {/* Identify Button */}
+      {imagePreview && !loading && (
+        <div style={{ textAlign: "center", marginTop: 25 }}>
+          <button
+            onClick={handleIdentify}
+            style={{
+              background: "#2563eb",
+              color: "white",
+              padding: "14px 32px",
+              borderRadius: 12,
+              border: "none",
+              cursor: "pointer",
+              fontWeight: 600,
+              fontSize: 18,
+            }}
+          >
+            Identify Plant
+          </button>
         </div>
       )}
 
@@ -251,7 +283,6 @@ console.log("BACKEND RESPONSE:", data);
         >
           <ReportViewer markdown={markdown} />
 
-          {/* Buttons */}
           <div
             style={{
               marginTop: 25,
