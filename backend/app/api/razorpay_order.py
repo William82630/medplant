@@ -1,3 +1,8 @@
+# app/api/payments.py
+# ==========================================
+# Razorpay Order Creation (FINAL FIXED)
+# ==========================================
+
 import os
 import razorpay
 from fastapi import APIRouter, HTTPException, Request
@@ -6,21 +11,30 @@ from app.utils.supabase_client import supabase
 router = APIRouter()
 
 # ---------------------------------------------------------
-# 🔥 Load Razorpay credentials from .env
+# Load Razorpay credentials from environment
 # ---------------------------------------------------------
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
 
 if not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET:
-    print("❌ Razorpay keys missing in .env")
+    raise RuntimeError("Razorpay keys are missing. Check your .env file.")
 
 client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 # ---------------------------------------------------------
-# Create Razorpay Order Route
+# Create Razorpay Order
 # ---------------------------------------------------------
 @router.post("/razorpay/create-order")
-async def create_order(request: Request):
+async def create_razorpay_order(request: Request):
+    """
+    Creates a Razorpay order and stores it in Supabase.
+    Expected payload:
+    {
+        "amount": 199,
+        "user_id": "uuid-from-supabase"
+    }
+    """
+
     try:
         body = await request.json()
 
@@ -28,11 +42,15 @@ async def create_order(request: Request):
         user_id = body.get("user_id")
 
         if not amount or not user_id:
-            raise HTTPException(status_code=400, detail="Missing amount or user_id")
+            raise HTTPException(
+                status_code=400,
+                detail="Missing required fields: amount or user_id"
+            )
 
-        amount_paise = int(amount) * 100  # Razorpay uses paise
+        # Razorpay works in paise
+        amount_paise = int(amount) * 100
 
-        # Create order in Razorpay
+        # Create Razorpay order
         order = client.order.create({
             "amount": amount_paise,
             "currency": "INR",
@@ -40,11 +58,15 @@ async def create_order(request: Request):
         })
 
         order_id = order.get("id")
+        if not order_id:
+            raise HTTPException(status_code=500, detail="Failed to create Razorpay order")
 
-        # Save order in Supabase
+        # Store order in Supabase
         supabase.table("orders").insert({
             "user_id": user_id,
-            "order_id": order_id
+            "order_id": order_id,
+            "amount": amount,
+            "status": "created"
         }).execute()
 
         return {
@@ -53,6 +75,12 @@ async def create_order(request: Request):
             "razorpay_key": RAZORPAY_KEY_ID
         }
 
+    except HTTPException:
+        raise
+
     except Exception as e:
-        print("❌ Error creating order:", str(e))
-        raise HTTPException(status_code=500, detail="Failed to create order")
+        print("❌ Razorpay create-order error:", str(e))
+        raise HTTPException(
+            status_code=500,
+            detail="Internal error while creating Razorpay order"
+        )

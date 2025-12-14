@@ -5,6 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 # ====================================================
+# ADD BACKEND TO PYTHON PATH
+# ====================================================
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# ====================================================
 # LOAD .env BEFORE ANY OTHER IMPORTS
 # ====================================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,8 +37,10 @@ else:
 from app.utils.supabase_client import supabase
 from app.utils.auth import verify_user
 
-from app.api import credits
-from app.api.identify import router as identify_router
+from app.routes import gemini_vision
+
+# Comment out credits - file doesn't exist
+# from app.api import credits
 from app.api.razorpay_webhook import router as razorpay_webhook_router
 from app.api.razorpay_order import router as razorpay_order_router
 
@@ -79,7 +86,11 @@ async def secure_test(request: Request):
 # ====================================================
 # ROUTERS
 # ====================================================
-app.include_router(credits.router, prefix="/api")
-app.include_router(identify_router, prefix="/api")
+# Comment out credits router - module doesn't exist
+# app.include_router(credits.router, prefix="/api")
+
 app.include_router(razorpay_order_router, prefix="/api")
 app.include_router(razorpay_webhook_router, prefix="/api")
+
+# Gemini Vision (IMAGE – plant identify)
+app.include_router(gemini_vision.router)

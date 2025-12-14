@@ -40,7 +40,7 @@ async def identify_plant(
         if not is_pro and credits_remaining <= 0:
             raise HTTPException(status_code=402, detail="No credits left")
 
-    # 3. Call Gemini
+    # 3. Call Gemini Vision
     try:
         ai_output = await gemini.identify_plant(image_bytes)
     except Exception as e:
@@ -62,3 +62,4 @@ async def identify_plant(
         "is_pro": is_pro,
         "logged_in": is_logged_in
     }
+
