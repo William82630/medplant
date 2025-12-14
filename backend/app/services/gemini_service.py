@@ -1,47 +1,55 @@
-# app/services/gemini_service.py
-
-from google import genai
-from google.genai.types import Part
+import base64
+import requests
+import os
 from fastapi import HTTPException
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+MODEL = "gemini-2.5-flash-preview-09-2025"
 
-class GeminiService:
-    def __init__(self, api_key: str):
-        if not api_key:
-            raise ValueError("Gemini API key missing in environment variables")
+def identify_plant_with_image(image_bytes: bytes, mime_type: str) -> str:
+    if not GEMINI_API_KEY:
+        raise HTTPException(500, "GEMINI_API_KEY missing")
 
-        # initialize Google GenAI client
-        self.client = genai.Client(api_key=api_key)
+    prompt = """
+Identify this medicinal plant.
+Structure the response with these Markdown headers:
 
-    async def identify_plant(self, image_bytes: bytes) -> str:
-        """
-        Sends a plant image to Gemini and returns structured text output.
-        """
+## Plant Identification Overview
+## Medicinal Benefits (Numbered List)
+## Side Effects (Numbered List)
+## Safety and Toxicity Warnings
+## How to Prepare
+## Where Found
+## Detail Explanation & Sources (Include links)
+"""
 
-        try:
-            # IMPORTANT — fixed model name
-            response = self.client.models.generate_content(
-                model="gemini-1.5-pro-latest",
-                contents=[
-                    Part.from_bytes(
-                        data=image_bytes,
-                        mime_type="image/jpeg"
-                    ),
-                    (
-                        "Analyze this plant image and respond ONLY with structured text:\n"
-                        "- English name\n"
-                        "- Scientific name\n"
-                        "- Key medicinal benefits\n"
-                        "- Risks or side effects\n"
-                        "- Additional important notes"
-                    )
-                ],
-            )
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
 
-            return response.text.strip()
+    payload = {
+        "contents": [{
+            "parts": [
+                { "text": prompt },
+                {
+                    "inlineData": {
+                        "mimeType": mime_type,
+                        "data": image_base64
+                    }
+                }
+            ]
+        }],
+        "tools": [{ "google_search": {} }]
+    }
 
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Gemini API error: {str(e)}"
-            )
+    url = (
+        f"https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{MODEL}:generateContent?key={GEMINI_API_KEY}"
+    )
+
+    r = requests.post(url, json=payload, timeout=60)
+    data = r.json()
+
+    if not r.ok:
+        raise HTTPException(500, data.get("error", {}).get("message", "Gemini error"))
+
+    text = data["candidates"][0]["content"]["parts"][0]["text"]
+    return text.strip()
